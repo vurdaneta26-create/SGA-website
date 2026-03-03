@@ -364,41 +364,12 @@
         </ul>
     </div>
 
-    <div class="main-content" id="mainContent">
-        <div class="post-filter-bar">
-            <span>New <i class="fas fa-chevron-down"></i></span>
-            <span><i class="fas fa-sort-amount-down"></i></span>
-            <span><i class="fas fa-chevron-down"></i></span>
-            <i class="fas fa-ellipsis-h" style="margin-left: auto;"></i>
-        </div>
-
-        <div class="post-separator"></div>
-
-        <div class="post-card post-2">
-            <div class="post-header">
-                <img src="https://via.placeholder.com/40/5d4037/ffffff?text=AC" alt="Ana Capo" class="avatar">
-                <div class="post-info">
-                    <span class="author-name">Ana Capo <span class="author-title-tag">Senior Vice-President</span></span>
-                </div>
-                <span class="post-date">Aug 21, 2025</span>
-            </div>
-            <div class="post-title">
-                Senior Hoodie Sizes <span class="post-tag">Clothing</span>
-            </div>
-            <div class="post-body">
-                Hi guys!<br>
-                We want to order the senior hoodies and we need everyone who wants one to write down their name and sizes by today at 3:15 or you will not receive one. Sorry for the short notice!<br>
-                As for the details, the price will be $30 and the payment method will be through Zelle (I'll send more details later), and the sizing is unisex. For reference, Declan tried on the medium and it fit him like a regular medium, and the medium on me was very oversized, so basically it's true to size.<br>
-                Please please please get this done today, thank you!!
-            </div>
-            <a href="#" class="attachment-link">
-                <i class="fas fa-file-alt"></i> Senior Hoodies
-            </a>
-            <div class="action-button">
-                <i class="fas fa-question-circle"></i> Ask a question
-            </div>
-        </div>
-    </div>
+   <div class="main-content" id="mainContent">
+       <div class="post-filter-bar">
+          </div>
+       
+       <div id="announcement-container"></div>
+</div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -429,4 +400,46 @@
     </script>
 
 </body>
+
 </html>
+
+<script>
+    // 1. Function to create the HTML for a single post card
+    function createPostHTML(post) {
+        // Only show approved and non-deleted posts
+        if (post.status !== "Approved" || post.is_deleted === "TRUE") return '';
+
+        return `
+            <div class="post-card">
+                <div class="post-header">
+                    <img src="https://via.placeholder.com/40" class="avatar">
+                    <div class="post-info">
+                        <span class="author-name">${post.author_name} <span class="author-title-tag">${post.category}</span></span>
+                    </div>
+                    <span class="post-date">${post.created_at}</span>
+                </div>
+                <div class="post-title">${post.title}</div>
+                <div class="post-body">${post.content}</div>
+                <div class="action-button">
+                    <i class="fas fa-question-circle"></i> Ask a question
+                </div>
+            </div>
+            <div class="post-separator"></div>
+        `;
+    }
+
+    // 2. Fetch and Parse the CSV
+    Papa.parse("announcements.csv", {
+        download: true,
+        header: true, // This uses your Excel headers (id, title, etc.) as keys
+        complete: function(results) {
+            const container = document.getElementById('announcement-container');
+            const data = results.data;
+            
+            // Loop through each row in your Excel/CSV
+            data.forEach(row => {
+                container.innerHTML += createPostHTML(row);
+            });
+        }
+    });
+   </script>

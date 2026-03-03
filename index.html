@@ -1,441 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" </script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Falcon Feed Mockup - Search Bar Centered</title>
+    <title>Falcon Feed - SGA Announcements</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    
     <style>
         /* Basic Reset */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f2f5;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Variables */
-        :root {
-            --sidebar-width-open: 250px;
-            --sidebar-width-closed: 40px; 
-            --button-size: 36px;
-        }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; display: flex; min-height: 100vh; }
+        :root { --sidebar-width-open: 250px; --sidebar-width-closed: 40px; --button-size: 36px; }
 
         /* Header Bar */
-        .header {
-            background-color: #0d2e53;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            /* Changed justify-content to center the logo/search/icons group better */
-            justify-content: space-between; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            box-sizing: border-box;
-            height: 60px;
-        }
-
-        /* --- UPDATED LOGO STYLES --- */
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            margin-right: 20px;
-            display: flex; /* Make it a flex container to align crest and text */
-            align-items: center;
-            gap: 10px; /* Space between the crest and the text */
-        }
-        
-        .logo img {
-            height: 35px; /* Adjust crest height to match the text size */
-            width: auto;
-        }
-        /* --- END UPDATED LOGO STYLES --- */
-
-        /* Search Area Styling - Re-centered */
-        .search-area {
-            display: flex;
-            align-items: center;
-            background-color: #174272;
-            border-radius: 20px;
-            padding: 5px 10px;
-            
-            /* KEY CHANGES FOR CENTERING: */
-            width: 450px; /* Set a fixed width */
-            margin: 0 auto; /* Center the element horizontally */
-            /* Removed flex-grow and max-width */
-        }
-        
-        .search-area .fas.fa-search {
-            margin-right: 10px; 
-        }
-
-        .search-tab {
-            background-color: #f0f0f0;
-            color: #0d2e53;
-            padding: 5px 10px; 
-            border-radius: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-right: 5px; 
-            font-size: 14px;
-        }
-        
-        .search-input {
-            background: none;
-            border: none;
-            color: white;
-            padding: 5px 10px;
-            outline: none;
-            flex-grow: 1; 
-        }
-
-        /* Action Icons Container */
-        .action-icons {
-            display: flex;
-            align-items: center;
-            /* Removed margin-left: auto; to allow margin: 0 auto on search area to work */
-        }
-
-        .action-icons a {
-            text-decoration: none;
-            color: white;
-            margin-left: 20px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            padding: 5px 10px;
-            border-radius: 20px;
-            transition: background-color 0.2s;
-        }
-        
-        /* Hover effect for all action links */
-        .action-icons a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .action-icons i {
-            font-size: 18px;
-            margin-right: 8px;
-        }
-        
-        /* Specific styling for the Create button */
-        .create-btn {
-             background-color: #f3722c; 
-             color: white;
-             padding: 5px 12px;
-             border-radius: 20px;
-        }
-        /* Keep Create button highlighted on hover */
-        .create-btn:hover {
-            background-color: #e0621d; 
-        }
-        
-        .user-icon {
-            background-color: #6a1b9a;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-left: 20px;
-        }
+        .header { background-color: #0d2e53; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-sizing: border-box; height: 60px; }
+        .logo { font-size: 24px; font-weight: bold; margin-right: 20px; display: flex; align-items: center; gap: 10px; }
+        .logo img { height: 35px; width: auto; }
+        .search-area { display: flex; align-items: center; background-color: #174272; border-radius: 20px; padding: 5px 10px; width: 450px; margin: 0 auto; }
+        .search-tab { background-color: #f0f0f0; color: #0d2e53; padding: 5px 10px; border-radius: 15px; font-weight: bold; margin-right: 5px; font-size: 14px; }
+        .search-input { background: none; border: none; color: white; padding: 5px 10px; outline: none; flex-grow: 1; }
+        .action-icons { display: flex; align-items: center; }
+        .action-icons a { text-decoration: none; color: white; margin-left: 20px; font-weight: bold; display: flex; align-items: center; padding: 5px 10px; border-radius: 20px; transition: background-color 0.2s; }
+        .create-btn { background-color: #f3722c; }
+        .user-icon { background-color: #6a1b9a; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-left: 20px; }
 
         /* Sidebar Navigation */
-        .sidebar {
-            width: var(--sidebar-width-open);
-            background-color: white;
-            padding-top: 60px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            z-index: 999;
-            box-sizing: border-box;
-            transition: width 0.3s ease;
-            overflow: hidden; 
-            border-right: 1px solid #ddd;
-        }
+        .sidebar { width: var(--sidebar-width-open); background-color: white; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; height: 100%; z-index: 999; box-sizing: border-box; transition: width 0.3s ease; overflow: hidden; border-right: 1px solid #ddd; }
+        .sidebar.collapsed { width: var(--sidebar-width-closed); }
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+        .sidebar-item { display: flex; align-items: center; padding: 12px 20px; color: #333; cursor: pointer; font-weight: 500; white-space: nowrap; text-decoration: none; transition: all 0.3s ease; }
+        .sidebar-item:hover { background-color: #e6e6e6; }
+        .sidebar-item i { margin-right: 15px; width: 20px; text-align: center; }
+        .category-header { font-weight: bold; color: #0d2e53; padding-top: 20px; }
+        .sidebar-item.active { background-color: #e0f7fa; color: #0d2e53; border-left: 4px solid #0d2e53; }
+        .divider { border-top: 1px solid #eee; margin: 10px 0; }
 
-        /* Collapsed State */
-        .sidebar.collapsed {
-            width: var(--sidebar-width-closed);
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
-        }
-        
-        /* HIDE ALL MENU ITEMS, HEADERS, AND DIVIDERS WHEN COLLAPSED */
-        .sidebar.collapsed .sidebar-item,
-        .sidebar.collapsed .divider {
-            height: 0;
-            padding: 0;
-            margin: 0;
-            opacity: 0;
-            pointer-events: none; 
-            transition: all 0.3s ease, opacity 0.1s; 
-        }
-        
-        .sidebar.collapsed .sidebar-item span {
-            opacity: 0;
-        }
+        /* Toggle Button */
+        .sidebar-toggle-btn { position: fixed; top: 112px; left: var(--sidebar-width-open); transform: translateX(-50%); background-color: white; width: var(--button-size); height: var(--button-size); border: 1px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1002; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #555; transition: left 0.3s ease; }
 
-        /* Toggle Button Positioning */
-        .sidebar-toggle-btn {
-            position: fixed; 
-            top: 112px; 
-            left: var(--sidebar-width-open); 
-            transform: translateX(calc(-0.5 * var(--button-size))); 
-            background-color: white;
-            width: var(--button-size);
-            height: var(--button-size);
-            border: 1px solid #ddd;
-            border-radius: 50%; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            z-index: 1002; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            color: #555;
-            transition: left 0.3s ease; 
-        }
+        /* Main Content */
+        .main-content { margin-left: var(--sidebar-width-open); padding: 80px 20px 20px 20px; flex-grow: 1; box-sizing: border-box; transition: margin-left 0.3s ease; width: 100%; }
+        .main-content-shifted { margin-left: var(--sidebar-width-closed); }
 
-        /* Sidebar Item Styling */
-        .sidebar-menu {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #333;
-            cursor: pointer;
-            font-weight: 500;
-            white-space: nowrap;
-            text-decoration: none; 
-            transition: all 0.3s ease;
-        }
-        
-        /* Hover effect for all sidebar items */
-        .sidebar-item:hover {
-            background-color: #e6e6e6; 
-        }
-        .sidebar-item.active:hover {
-            background-color: #d8eff2; 
-        }
-        
-        .sidebar-item i {
-            margin-right: 15px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar-item.category-header {
-            font-weight: bold;
-            color: #0d2e53;
-            padding-top: 20px;
-            padding-bottom: 5px;
-            padding-left: 20px; 
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-item.active {
-            background-color: #e0f7fa;
-            color: #0d2e53;
-            border-left: 4px solid #0d2e53;
-            font-weight: bold;
-        }
-        
-        .divider {
-            border-top: 1px solid #eee;
-            margin: 10px 0;
-        }
-
-
-        /* Main Content Area */
-        .main-content {
-            margin-left: var(--sidebar-width-open); 
-            padding: 80px 20px 20px 20px;
-            flex-grow: 1;
-            box-sizing: border-box;
-            transition: margin-left 0.3s ease;
-            width: 100%;
-        }
-
-        /* Main Content Shift when Sidebar is Collapsed */
-        .main-content-shifted {
-            margin-left: var(--sidebar-width-closed); 
-        }
-
-
-        /* Post Card styling */
-        .post-filter-bar { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; color: #555; }
-        .post-filter-bar i { margin-left: 5px; color: #888; }
-        .post-filter-bar span { margin-right: 15px; cursor: pointer; }
-        .post-filter-bar i { margin-left: auto; }
-        .post-card { 
-            background-color: white; 
-            border-radius: 8px; 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
-            padding: 20px; 
-            margin-bottom: 20px; 
-        }
+        /* Post Cards */
+        .post-card { background-color: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
         .post-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
-        .post-info { display: flex; flex-direction: column; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
         .author-name { font-weight: bold; color: #333; }
-        .author-title-tag { font-size: 12px; background-color: #e0f7fa; color: #0d2e53; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: normal; }
+        .author-title-tag { font-size: 12px; background-color: #e0f7fa; color: #0d2e53; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
         .post-date { font-size: 12px; color: #888; margin-left: auto; }
-        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0d2e53; display: flex; align-items: center; }
-        .post-tag { font-size: 12px; background-color: #f3e5f5; color: #6a1b9a; padding: 3px 8px; border-radius: 10px; margin-left: 10px; font-weight: normal; }
-        .post-body { line-height: 1.6; color: #555; margin-bottom: 15px; }
-        .action-button { display: inline-flex; align-items: center; background-color: #eee; color: #0d2e53; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 15px;}
-        .action-button i { margin-right: 8px; }
-        .attachment-link { display: inline-flex; align-items: center; background-color: #e8f5e9; color: #388e3c; padding: 5px 10px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: 600; }
-        .attachment-link i { margin-right: 5px; }
+        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0d2e53; }
+        .post-body { line-height: 1.6; color: #555; }
+        .action-button { display: inline-flex; align-items: center; background-color: #eee; color: #0d2e53; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 15px; }
         .post-separator { border-top: 1px solid #eee; margin: 20px 0; }
     </style>
 </head>
 <body>
 
     <div class="header">
-        <div class="logo">
-            <img src="palmer trinity crest.png" alt="Crest">
-            Falcon Feed
-        </div>
-        
+        <div class="logo">Falcon Feed</div>
         <div class="search-area">
             <i class="fas fa-search"></i>
-            <div class="search-tab">12th Grade</div>
-            <input type="text" class="search-input" placeholder="Search in 12th Grade">
+            <input type="text" class="search-input" placeholder="Search announcements...">
         </div>
-        
         <div class="action-icons">
-            <a href="C:\Users\vurdaneta26\Downloads\the website\create post.html" class="create-btn">
-                <i class="fas fa-plus-square"></i> Create
-            </a>
-            <a href="11.com" style="margin-right: -5px;">
-                <i class="fas fa-bell"></i>
-            </a>
+            <a href="#" class="create-btn"><i class="fas fa-plus-square"></i> Create</a>
         </div>
-        
         <div class="user-icon">VU</div>
     </div>
     
-    <div class="sidebar-toggle-btn" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-    </div>
+    <div class="sidebar-toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
 
     <div class="sidebar" id="sidebar">
         <ul class="sidebar-menu">
-            <a href="1.com" class="sidebar-item">
-                <i class="fas fa-home"></i> <span>Home</span>
-            </a>
+            <a href="#" class="sidebar-item active"><i class="fas fa-home"></i> <span>Home</span></a>
             <div class="divider"></div>
-            <a href="2.com" class="sidebar-item category-header"><span>EXEC Executive</span></a>
-            <a href="3.com" class="sidebar-item category-header active"><span>12TH Seniors</span></a>
-            <a href="4.com" class="sidebar-item category-header"><span>11TH Juniors</span></a>
-            <a href="5.com" class="sidebar-item category-header"><span>10TH Sophomores</span></a>
-            <a href="6.com" class="sidebar-item category-header"><span>9TH Freshmen</span></a>
+            <div class="sidebar-item category-header"><span>Groups</span></div>
+            <a href="#" class="sidebar-item"><span>12TH Seniors</span></a>
+            <a href="#" class="sidebar-item"><span>11TH Juniors</span></a>
             <div class="divider"></div>
-            <a href="7.com" class="sidebar-item">
-                <i class="fas fa-question-circle"></i> <span>FAQ</span>
-            </a>
-            <a href="8.com" class="sidebar-item">
-                <i class="fas fa-info-circle"></i> <span>About</span>
-            </a>
-            <div class="divider"></div>
-            <a href="9.com" class="sidebar-item">
-                <i class="fas fa-arrow-left"></i> <span>Back to Student Portal</span>
-            </a>
+            <a href="#" class="sidebar-item"><i class="fas fa-question-circle"></i> <span>FAQ</span></a>
         </ul>
     </div>
 
-   <div class="main-content" id="mainContent">
-       <div class="post-filter-bar">
-          </div>
-       
-       <div id="announcement-container"></div>
-</div>
+    <div class="main-content" id="mainContent">
+        <div id="announcement-container">
+            <p style="text-align: center; color: #888;">Loading announcements...</p>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- SIDEBAR LOGIC ---
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const toggleButton = document.getElementById('sidebarToggle');
-            const rootStyle = getComputedStyle(document.documentElement);
             
-            const sidebarWidthOpen = rootStyle.getPropertyValue('--sidebar-width-open').trim();
-            const sidebarWidthClosed = rootStyle.getPropertyValue('--sidebar-width-closed').trim();
-
-            function updateButtonPosition() {
-                if (sidebar.classList.contains('collapsed')) {
-                    toggleButton.style.left = sidebarWidthClosed;
-                } else {
-                    toggleButton.style.left = sidebarWidthOpen;
-                }
-            }
-
-            updateButtonPosition();
-
             toggleButton.addEventListener('click', function() {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('main-content-shifted');
-                updateButtonPosition();
+                toggleButton.style.left = sidebar.classList.contains('collapsed') ? '40px' : '250px';
+            });
+
+            // --- DATA LOADING LOGIC ---
+            const container = document.getElementById('announcement-container');
+
+            Papa.parse("announcements.csv", {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    container.innerHTML = ''; // Clear the "Loading" message
+                    
+                    if (results.data.length === 0) {
+                        container.innerHTML = '<p>No announcements found.</p>';
+                        return;
+                    }
+
+                    results.data.forEach(row => {
+                        // Only show Approved posts that aren't deleted
+                        if (row.status === "Approved" && row.is_deleted !== "TRUE") {
+                            container.innerHTML += `
+                                <div class="post-card">
+                                    <div class="post-header">
+                                        <img src="https://via.placeholder.com/40" class="avatar">
+                                        <div class="post-info">
+                                            <span class="author-name">${row.author_name || 'SGA Member'} 
+                                                <span class="author-title-tag">${row.category || 'General'}</span>
+                                            </span>
+                                        </div>
+                                        <span class="post-date">${row.created_at || ''}</span>
+                                    </div>
+                                    <div class="post-title">${row.title}</div>
+                                    <div class="post-body">${row.content}</div>
+                                    <div class="action-button">
+                                        <i class="fas fa-question-circle"></i> Ask a question
+                                    </div>
+                                </div>
+                                <div class="post-separator"></div>
+                            `;
+                        }
+                    });
+                },
+                error: function(err) {
+                    container.innerHTML = '<p style="color:red;">Error loading CSV. Check if the file exists and the name is correct.</p>';
+                    console.error(err);
+                }
             });
         });
     </script>
-
 </body>
-
 </html>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // We fetch the container ONLY after the page is fully loaded
-    const container = document.getElementById('announcement-container');
-
-    Papa.parse("announcements.csv", {
-        download: true,
-        header: true,
-        complete: function(results) {
-            // Check if container exists to prevent the 'null' error
-            if (!container) {
-                console.error("Could not find the announcement-container div!");
-                return;
-            }
-
-            results.data.forEach(row => {
-                // Only process rows that have a title (skips empty lines in Excel)
-                if (row.title) {
-                    container.innerHTML += createPostHTML(row);
-                }
-            });
-        }
-    });
-});
-
-function createPostHTML(post) {
-    // Ensure these keys (post.title, etc.) match your Excel headers exactly
-    return `
-        <div class="post-card">
-            <div class="post-title">${post.title}</div>
-            <div class="post-body">${post.content}</div>
-        </div>
-    `;
-}
-</script>
-

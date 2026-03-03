@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js" </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falcon Feed Mockup - Search Bar Centered</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Basic Reset */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Variables */
+        :root {
+            --sidebar-width-open: 250px;
+            --sidebar-width-closed: 40px; 
+            --button-size: 36px;
+        }
+
+        /* Header Bar */
+        .header {
+            background-color: #0d2e53;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            /* Changed justify-content to center the logo/search/icons group better */
+            justify-content: space-between; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            box-sizing: border-box;
+            height: 60px;
+        }
+
+        /* --- UPDATED LOGO STYLES --- */
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-right: 20px;
+            display: flex; /* Make it a flex container to align crest and text */
+            align-items: center;
+            gap: 10px; /* Space between the crest and the text */
+        }
+        
+        .logo img {
+            height: 35px; /* Adjust crest height to match the text size */
+            width: auto;
+        }
+        /* --- END UPDATED LOGO STYLES --- */
+
+        /* Search Area Styling - Re-centered */
+        .search-area {
+            display: flex;
+            align-items: center;
+            background-color: #174272;
+            border-radius: 20px;
+            padding: 5px 10px;
+            
+            /* KEY CHANGES FOR CENTERING: */
+            width: 450px; /* Set a fixed width */
+            margin: 0 auto; /* Center the element horizontally */
+            /* Removed flex-grow and max-width */
+        }
+        
+        .search-area .fas.fa-search {
+            margin-right: 10px; 
+        }
+
+        .search-tab {
+            background-color: #f0f0f0;
+            color: #0d2e53;
+            padding: 5px 10px; 
+            border-radius: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 5px; 
+            font-size: 14px;
+        }
+        
+        .search-input {
+            background: none;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            outline: none;
+            flex-grow: 1; 
+        }
+
+        /* Action Icons Container */
+        .action-icons {
+            display: flex;
+            align-items: center;
+            /* Removed margin-left: auto; to allow margin: 0 auto on search area to work */
+        }
+
+        .action-icons a {
+            text-decoration: none;
+            color: white;
+            margin-left: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+            border-radius: 20px;
+            transition: background-color 0.2s;
+        }
+        
+        /* Hover effect for all action links */
+        .action-icons a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .action-icons i {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        
+        /* Specific styling for the Create button */
+        .create-btn {
+             background-color: #f3722c; 
+             color: white;
+             padding: 5px 12px;
+             border-radius: 20px;
+        }
+        /* Keep Create button highlighted on hover */
+        .create-btn:hover {
+            background-color: #e0621d; 
+        }
+        
+        .user-icon {
+            background-color: #6a1b9a;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width-open);
+            background-color: white;
+            padding-top: 60px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            z-index: 999;
+            box-sizing: border-box;
+            transition: width 0.3s ease;
+            overflow: hidden; 
+            border-right: 1px solid #ddd;
+        }
+
+        /* Collapsed State */
+        .sidebar.collapsed {
+            width: var(--sidebar-width-closed);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1); 
+        }
+        
+        /* HIDE ALL MENU ITEMS, HEADERS, AND DIVIDERS WHEN COLLAPSED */
+        .sidebar.collapsed .sidebar-item,
+        .sidebar.collapsed .divider {
+            height: 0;
+            padding: 0;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none; 
+            transition: all 0.3s ease, opacity 0.1s; 
+        }
+        
+        .sidebar.collapsed .sidebar-item span {
+            opacity: 0;
+        }
+
+        /* Toggle Button Positioning */
+        .sidebar-toggle-btn {
+            position: fixed; 
+            top: 112px; 
+            left: var(--sidebar-width-open); 
+            transform: translateX(calc(-0.5 * var(--button-size))); 
+            background-color: white;
+            width: var(--button-size);
+            height: var(--button-size);
+            border: 1px solid #ddd;
+            border-radius: 50%; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1002; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #555;
+            transition: left 0.3s ease; 
+        }
+
+        /* Sidebar Item Styling */
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #333;
+            cursor: pointer;
+            font-weight: 500;
+            white-space: nowrap;
+            text-decoration: none; 
+            transition: all 0.3s ease;
+        }
+        
+        /* Hover effect for all sidebar items */
+        .sidebar-item:hover {
+            background-color: #e6e6e6; 
+        }
+        .sidebar-item.active:hover {
+            background-color: #d8eff2; 
+        }
+        
+        .sidebar-item i {
+            margin-right: 15px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar-item.category-header {
+            font-weight: bold;
+            color: #0d2e53;
+            padding-top: 20px;
+            padding-bottom: 5px;
+            padding-left: 20px; 
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-item.active {
+            background-color: #e0f7fa;
+            color: #0d2e53;
+            border-left: 4px solid #0d2e53;
+            font-weight: bold;
+        }
+        
+        .divider {
+            border-top: 1px solid #eee;
+            margin: 10px 0;
+        }
+
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width-open); 
+            padding: 80px 20px 20px 20px;
+            flex-grow: 1;
+            box-sizing: border-box;
+            transition: margin-left 0.3s ease;
+            width: 100%;
+        }
+
+        /* Main Content Shift when Sidebar is Collapsed */
+        .main-content-shifted {
+            margin-left: var(--sidebar-width-closed); 
+        }
+
+
+        /* Post Card styling */
+        .post-filter-bar { display: flex; align-items: center; margin-bottom: 20px; font-weight: bold; color: #555; }
+        .post-filter-bar i { margin-left: 5px; color: #888; }
+        .post-filter-bar span { margin-right: 15px; cursor: pointer; }
+        .post-filter-bar i { margin-left: auto; }
+        .post-card { 
+            background-color: white; 
+            border-radius: 8px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            padding: 20px; 
+            margin-bottom: 20px; 
+        }
+        .post-header { display: flex; align-items: center; margin-bottom: 15px; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
+        .post-info { display: flex; flex-direction: column; }
+        .author-name { font-weight: bold; color: #333; }
+        .author-title-tag { font-size: 12px; background-color: #e0f7fa; color: #0d2e53; padding: 2px 8px; border-radius: 10px; margin-left: 8px; font-weight: normal; }
+        .post-date { font-size: 12px; color: #888; margin-left: auto; }
+        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0d2e53; display: flex; align-items: center; }
+        .post-tag { font-size: 12px; background-color: #f3e5f5; color: #6a1b9a; padding: 3px 8px; border-radius: 10px; margin-left: 10px; font-weight: normal; }
+        .post-body { line-height: 1.6; color: #555; margin-bottom: 15px; }
+        .action-button { display: inline-flex; align-items: center; background-color: #eee; color: #0d2e53; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 15px;}
+        .action-button i { margin-right: 8px; }
+        .attachment-link { display: inline-flex; align-items: center; background-color: #e8f5e9; color: #388e3c; padding: 5px 10px; border-radius: 5px; margin-top: 10px; font-size: 13px; font-weight: 600; }
+        .attachment-link i { margin-right: 5px; }
+        .post-separator { border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">
+            <img src="palmer trinity crest.png" alt="Crest">
+            Falcon Feed
+        </div>
+        
+        <div class="search-area">
+            <i class="fas fa-search"></i>
+            <div class="search-tab">12th Grade</div>
+            <input type="text" class="search-input" placeholder="Search in 12th Grade">
+        </div>
+        
+        <div class="action-icons">
+            <a href="C:\Users\vurdaneta26\Downloads\the website\create post.html" class="create-btn">
+                <i class="fas fa-plus-square"></i> Create
+            </a>
+            <a href="11.com" style="margin-right: -5px;">
+                <i class="fas fa-bell"></i>
+            </a>
+        </div>
+        
+        <div class="user-icon">VU</div>
+    </div>
+    
+    <div class="sidebar-toggle-btn" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <a href="1.com" class="sidebar-item">
+                <i class="fas fa-home"></i> <span>Home</span>
+            </a>
+            <div class="divider"></div>
+            <a href="2.com" class="sidebar-item category-header"><span>EXEC Executive</span></a>
+            <a href="3.com" class="sidebar-item category-header active"><span>12TH Seniors</span></a>
+            <a href="4.com" class="sidebar-item category-header"><span>11TH Juniors</span></a>
+            <a href="5.com" class="sidebar-item category-header"><span>10TH Sophomores</span></a>
+            <a href="6.com" class="sidebar-item category-header"><span>9TH Freshmen</span></a>
+            <div class="divider"></div>
+            <a href="7.com" class="sidebar-item">
+                <i class="fas fa-question-circle"></i> <span>FAQ</span>
+            </a>
+            <a href="8.com" class="sidebar-item">
+                <i class="fas fa-info-circle"></i> <span>About</span>
+            </a>
+            <div class="divider"></div>
+            <a href="9.com" class="sidebar-item">
+                <i class="fas fa-arrow-left"></i> <span>Back to Student Portal</span>
+            </a>
+        </ul>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="post-filter-bar">
+            <span>New <i class="fas fa-chevron-down"></i></span>
+            <span><i class="fas fa-sort-amount-down"></i></span>
+            <span><i class="fas fa-chevron-down"></i></span>
+            <i class="fas fa-ellipsis-h" style="margin-left: auto;"></i>
+        </div>
+
+        <div class="post-separator"></div>
+
+        <div class="post-card post-2">
+            <div class="post-header">
+                <img src="https://via.placeholder.com/40/5d4037/ffffff?text=AC" alt="Ana Capo" class="avatar">
+                <div class="post-info">
+                    <span class="author-name">Ana Capo <span class="author-title-tag">Senior Vice-President</span></span>
+                </div>
+                <span class="post-date">Aug 21, 2025</span>
+            </div>
+            <div class="post-title">
+                Senior Hoodie Sizes <span class="post-tag">Clothing</span>
+            </div>
+            <div class="post-body">
+                Hi guys!<br>
+                We want to order the senior hoodies and we need everyone who wants one to write down their name and sizes by today at 3:15 or you will not receive one. Sorry for the short notice!<br>
+                As for the details, the price will be $30 and the payment method will be through Zelle (I'll send more details later), and the sizing is unisex. For reference, Declan tried on the medium and it fit him like a regular medium, and the medium on me was very oversized, so basically it's true to size.<br>
+                Please please please get this done today, thank you!!
+            </div>
+            <a href="#" class="attachment-link">
+                <i class="fas fa-file-alt"></i> Senior Hoodies
+            </a>
+            <div class="action-button">
+                <i class="fas fa-question-circle"></i> Ask a question
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const toggleButton = document.getElementById('sidebarToggle');
+            const rootStyle = getComputedStyle(document.documentElement);
+            
+            const sidebarWidthOpen = rootStyle.getPropertyValue('--sidebar-width-open').trim();
+            const sidebarWidthClosed = rootStyle.getPropertyValue('--sidebar-width-closed').trim();
+
+            function updateButtonPosition() {
+                if (sidebar.classList.contains('collapsed')) {
+                    toggleButton.style.left = sidebarWidthClosed;
+                } else {
+                    toggleButton.style.left = sidebarWidthOpen;
+                }
+            }
+
+            updateButtonPosition();
+
+            toggleButton.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('main-content-shifted');
+                updateButtonPosition();
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -404,42 +404,38 @@
 </html>
 
 <script>
-    // 1. Function to create the HTML for a single post card
-    function createPostHTML(post) {
-        // Only show approved and non-deleted posts
-        if (post.status !== "Approved" || post.is_deleted === "TRUE") return '';
+document.addEventListener('DOMContentLoaded', function() {
+    // We fetch the container ONLY after the page is fully loaded
+    const container = document.getElementById('announcement-container');
 
-        return `
-            <div class="post-card">
-                <div class="post-header">
-                    <img src="https://via.placeholder.com/40" class="avatar">
-                    <div class="post-info">
-                        <span class="author-name">${post.author_name} <span class="author-title-tag">${post.category}</span></span>
-                    </div>
-                    <span class="post-date">${post.created_at}</span>
-                </div>
-                <div class="post-title">${post.title}</div>
-                <div class="post-body">${post.content}</div>
-                <div class="action-button">
-                    <i class="fas fa-question-circle"></i> Ask a question
-                </div>
-            </div>
-            <div class="post-separator"></div>
-        `;
-    }
-
-    // 2. Fetch and Parse the CSV
     Papa.parse("announcements.csv", {
         download: true,
-        header: true, // This uses your Excel headers (id, title, etc.) as keys
+        header: true,
         complete: function(results) {
-            const container = document.getElementById('announcement-container');
-            const data = results.data;
-            
-            // Loop through each row in your Excel/CSV
-            data.forEach(row => {
-                container.innerHTML += createPostHTML(row);
+            // Check if container exists to prevent the 'null' error
+            if (!container) {
+                console.error("Could not find the announcement-container div!");
+                return;
+            }
+
+            results.data.forEach(row => {
+                // Only process rows that have a title (skips empty lines in Excel)
+                if (row.title) {
+                    container.innerHTML += createPostHTML(row);
+                }
             });
         }
     });
-   </script>
+});
+
+function createPostHTML(post) {
+    // Ensure these keys (post.title, etc.) match your Excel headers exactly
+    return `
+        <div class="post-card">
+            <div class="post-title">${post.title}</div>
+            <div class="post-body">${post.content}</div>
+        </div>
+    `;
+}
+</script>
+

@@ -84,7 +84,8 @@
     </div>
 
     <div class="main-content" id="mainContent">
-    <div class="post-filter-bar">
+    
+        <div class="post-filter-bar">
         <span>New <i class="fas fa-chevron-down"></i></span>
         <i class="fas fa-ellipsis-h" style="margin-left: auto;"></i>
     </div>
@@ -113,6 +114,7 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(results) {
+                    console.log("CSV Data Received:", results.data);
                     container.innerHTML = ''; // Clear the "Loading" message
                     
                     if (results.data.length === 0) {
@@ -122,7 +124,10 @@
 
                     results.data.forEach(row => {
                         // Only show Approved posts that aren't deleted
-                        if (row.status === "Approved" && row.is_deleted !== "TRUE") {
+                        const isDeleted = String(row.is_deleted).toLowerCase() === "true";
+                        const isApproved = row.status === "Approved";
+                        
+                        if (isApproved && !isDeleted) {
                             container.innerHTML += `
                                 <div class="post-card">
                                     <div class="post-header">
@@ -154,4 +159,5 @@
     </script>
 </body>
 </html>
+
 

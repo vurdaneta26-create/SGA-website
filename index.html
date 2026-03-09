@@ -70,18 +70,25 @@
     </div>
     
     <div class="sidebar-toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
-
+//sidebar changes apple
     <div class="sidebar" id="sidebar">
-        <ul class="sidebar-menu">
-            <a href="#" class="sidebar-item active"><i class="fas fa-home"></i> <span>Home</span></a>
-            <div class="divider"></div>
-            <div class="sidebar-item category-header"><span>Groups</span></div>
-            <a href="#" class="sidebar-item"><span>12TH Seniors</span></a>
-            <a href="#" class="sidebar-item"><span>11TH Juniors</span></a>
-            <div class="divider"></div>
-            <a href="#" class="sidebar-item"><i class="fas fa-question-circle"></i> <span>FAQ</span></a>
-        </ul>
-    </div>
+    <ul class="sidebar-menu">
+        <a href="index.html" class="sidebar-item" id="nav-all"><i class="fas fa-home"></i> <span>Home</span></a>
+        
+        <div class="divider"></div>
+        <div class="sidebar-item category-header"><span>Groups</span></div>
+        
+        <a href="index.html?grade=EXEC" class="sidebar-item" id="nav-EXEC"><i class="fas fa-star"></i> <span>Executive</span></a>
+        <a href="index.html?grade=12" class="sidebar-item" id="nav-12"><span>12TH Seniors</span></a>
+        <a href="index.html?grade=11" class="sidebar-item" id="nav-11"><span>11TH Juniors</span></a>
+        <a href="index.html?grade=10" class="sidebar-item" id="nav-10"><span>10TH Sophomores</span></a>
+        <a href="index.html?grade=9" class="sidebar-item" id="nav-9"><span>9TH Freshmen</span></a>
+        
+        <div class="divider"></div>
+        <a href="faq.html" class="sidebar-item"><i class="fas fa-question-circle"></i> <span>FAQ</span></a>
+        <a href="about.html" class="sidebar-item"><i class="fas fa-info-circle"></i> <span>About</span></a>
+    </ul>
+</div>
 
     <div class="main-content" id="mainContent">
     
@@ -94,70 +101,77 @@
 </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // --- SIDEBAR LOGIC ---
-            const sidebar = document.getElementById('sidebar');
-            const mainContent = document.getElementById('mainContent');
-            const toggleButton = document.getElementById('sidebarToggle');
-            
-            toggleButton.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('main-content-shifted');
-                toggleButton.style.left = sidebar.classList.contains('collapsed') ? '40px' : '250px';
-            });
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. GET THE FILTER FROM THE URL ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const gradeFilter = urlParams.get('grade'); // Returns '12', 'EXEC', etc., or null
 
-            // --- DATA LOADING LOGIC ---
-            const container = document.getElementById('announcement-container');
+        // Highlight active sidebar item
+        if (gradeFilter) {
+            document.getElementById(`nav-${gradeFilter}`)?.classList.add('active');
+            document.getElementById('nav-all').classList.remove('active');
+        }
 
-            Papa.parse("announcements.csv", {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                complete: function(results) {
-                    console.log("CSV Data Received:", results.data);
-                    container.innerHTML = ''; // Clear the "Loading" message
+        // --- 2. DATA LOADING & FILTERING ---
+        const container = document.getElementById('announcement-container');
+
+        Papa.parse("announcements.csv", {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            beforeFirstChunk: function(chunk) {
+                return chunk.replace(/, /g, ",");
+            },
+            complete: function(results) {
+                container.innerHTML = ''; 
+                
+                const filteredData = results.data.filter(row => {
+                    const isApproved = row.status === "Approved";
+                    const isNotDeleted = String(row.is_deleted).toUpperCase() !== "TRUE";
                     
-                    if (results.data.length === 0) {
-                        container.innerHTML = '<p>No announcements found.</p>';
-                        return;
-                    }
+                    // If a grade filter exists, only show matching rows. Otherwise, show all.
+                    const matchesGrade = !gradeFilter || String(row.grade) === gradeFilter;
 
-                    results.data.forEach(row => {
-                        // Only show Approved posts that aren't deleted
-                        const isDeleted = String(row.is_deleted).toLowerCase() === "true";
-                        const isApproved = row.status === "Approved";
-                        
-                        if (isApproved && !isDeleted) {
-                            container.innerHTML += `
-                                <div class="post-card">
-                                    <div class="post-header">
-                                        <img src="https://via.placeholder.com/40" class="avatar">
-                                        <div class="post-info">
-                                            <span class="author-name">${row.author_name || 'SGA Member'} 
-                                                <span class="author-title-tag">${row.category || 'General'}</span>
-                                            </span>
-                                        </div>
-                                        <span class="post-date">${row.created_at || ''}</span>
-                                    </div>
-                                    <div class="post-title">${row.title}</div>
-                                    <div class="post-body">${row.content}</div>
-                                    <div class="action-button">
-                                        <i class="fas fa-question-circle"></i> Ask a question
-                                    </div>
-                                </div>
-                                <div class="post-separator"></div>
-                            `;
-                        }
-                    });
-                },
-                error: function(err) {
-                    container.innerHTML = '<p style="color:red;">Error loading CSV. Check if the file exists and the name is correct.</p>';
-                    console.error(err);
+                    return isApproved && isNotDeleted && matchesGrade;
+                });
+
+                if (filteredData.length === 0) {
+                    container.innerHTML = `<p>No announcements found for ${gradeFilter || 'everyone'}.</p>`;
+                    return;
                 }
-            });
+
+                filteredData.forEach(row => {
+                    container.innerHTML += `
+                        <div class="post-card">
+                            <div class="post-header">
+                                <img src="https://via.placeholder.com/40" class="avatar">
+                                <div class="post-info">
+                                    <span class="author-name">${row.author_name || 'SGA Member'} 
+                                        <span class="author-title-tag">${row.grade || 'General'}</span>
+                                    </span>
+                                </div>
+                                <span class="post-date">${row.created_at || ''}</span>
+                            </div>
+                            <div class="post-title">${row.title}</div>
+                            <div class="post-body">${row.content}</div>
+                            <div class="action-button"><i class="fas fa-question-circle"></i> Ask a question</div>
+                        </div>
+                        <div class="post-separator"></div>
+                    `;
+                });
+            }
         });
-    </script>
+
+        // Sidebar toggle logic (Keep your existing code here)
+        const sidebar = document.getElementById('sidebar');
+        const toggleButton = document.getElementById('sidebarToggle');
+        toggleButton.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+    });
+</script>
 </body>
 </html>
+
 
 

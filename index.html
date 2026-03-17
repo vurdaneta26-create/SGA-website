@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    const userPermissions = {
+    "yourname@gmail.com": "ADMIN",
+    "principal@school.edu": "ADMIN",
+    "studentrep@school.edu": "MODERATOR"
+    };
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -198,18 +204,58 @@
         });
     });
 //NEW SCRIPT
-    function handleCredentialResponse(response) {
-    // Decode the Google JWT token to get user info
+    // Global variable to store the user's role
+let currentUserRole = "STUDENT"; 
+
+function handleCredentialResponse(response) {
     const responsePayload = parseJwt(response.credential);
+    const userEmail = responsePayload.email;
 
-    console.log("Logged in as: " + responsePayload.name);
+    // Load the permissions CSV
+    Papa.parse("permissions.csv", {
+        download: true,
+        header: true,
+        skipEmptyLines: true,
+        complete: function(results) {
+            // Find the row that matches the logged-in user's email
+            const userRow = results.data.find(row => 
+                row.email.trim().toLowerCase() === userEmail.toLowerCase()
+            );
 
-    // 1. Hide the login screen and show the website
+            // Assign role if found, otherwise default to STUDENT
+            currentUserRole = userRow ? userRow.role.toUpperCase() : "STUDENT";
+
+            console.log(`User: ${userEmail} | Role: ${currentUserRole}`);
+            
+            // Now that we have the role, unlock the site
+            unlockSite(responsePayload);
+        }
+    });
+}
+
+function unlockSite(userData) {
+    // 1. Hide Login / Show Site
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('wrapper').style.display = 'block';
 
-    // 2. (Optional) Store user info to show their name/picture in the sidebar
-    // localStorage.setItem('user_name', responsePayload.name);
+    // 2. Update Sidebar Avatar with Google Profile Pic
+    const avatarImg = document.querySelector('.sidebar .avatar');
+    if (avatarImg) avatarImg.src = userData.picture;
+
+    // 3. Show/Hide Admin UI elements
+    const createBtn = document.querySelector('.create-btn');
+    if (currentUserRole === "ADMIN") {
+        createBtn.style.display = 'flex';
+    } else {
+        createBtn.style.display = 'none';
+    }
+}
+
+    // Example: Update the sidebar avatar with the Google Profile Pic
+    const avatarImg = document.querySelector('.sidebar .avatar'); // Adjust selector as needed
+    if (avatarImg) {
+        avatarImg.src = userData.picture;
+    }
 }
 
 // Helper function to decode user info from Google

@@ -2,78 +2,76 @@
 <html lang="en">
 <head>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-
     
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Falcon Feed - SGA Announcements</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    
-    <style>
-        /* Basic Reset */
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; display: flex; min-height: 100vh; }
-        :root { --sidebar-width-open: 250px; --sidebar-width-closed: 40px; --button-size: 36px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Falcon Feed - SGA Announcements</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
 
-        /* Header Bar */
-        .header { background-color: #0d2e53; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-sizing: border-box; height: 60px; }
-        .logo { font-size: 24px; font-weight: bold; margin-right: 20px; display: flex; align-items: center; gap: 10px; }
-        .logo img { height: 35px; width: auto; }
-        .search-area { display: flex; align-items: center; background-color: #174272; border-radius: 20px; padding: 5px 10px; width: 450px; margin: 0 auto; }
-        .search-tab { background-color: #f0f0f0; color: #0d2e53; padding: 5px 10px; border-radius: 15px; font-weight: bold; margin-right: 5px; font-size: 14px; }
-        .search-input { background: none; border: none; color: white; padding: 5px 10px; outline: none; flex-grow: 1; }
-        .action-icons { display: flex; align-items: center; }
-        .action-icons a { text-decoration: none; color: white; margin-left: 20px; font-weight: bold; display: flex; align-items: center; padding: 5px 10px; border-radius: 20px; transition: background-color 0.2s; }
-        .create-btn { background-color: #f3722c; }
-        .user-icon { background-color: #6a1b9a; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-left: 20px; }
+<style>
+/* Basic Reset */
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; display: flex; min-height: 100vh; }
+:root { --sidebar-width-open: 250px; --sidebar-width-closed: 40px; --button-size: 36px; }
 
-        /* Sidebar Navigation */
-        .sidebar { width: var(--sidebar-width-open); background-color: white; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; height: 100%; z-index: 999; box-sizing: border-box; transition: width 0.3s ease; overflow: hidden; border-right: 1px solid #ddd; }
-        .sidebar.collapsed { width: var(--sidebar-width-closed); }
-        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
-        .sidebar-item { display: flex; align-items: center; padding: 12px 20px; color: #333; cursor: pointer; font-weight: 500; white-space: nowrap; text-decoration: none; transition: all 0.3s ease; }
-        .sidebar-item:hover { background-color: #e6e6e6; }
-        .sidebar-item i { margin-right: 15px; width: 20px; text-align: center; }
-        .category-header { font-weight: bold; color: #0d2e53; padding-top: 20px; }
-        .sidebar-item.active { background-color: #e0f7fa; color: #0d2e53; border-left: 4px solid #0d2e53; }
-        .divider { border-top: 1px solid #eee; margin: 10px 0; }
+/* Header Bar */
+.header { background-color: #0d2e53; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; box-sizing: border-box; height: 60px; }
+.logo { font-size: 24px; font-weight: bold; margin-right: 20px; display: flex; align-items: center; gap: 10px; }
+.logo img { height: 35px; width: auto; }
+.search-area { display: flex; align-items: center; background-color: #174272; border-radius: 20px; padding: 5px 10px; width: 450px; margin: 0 auto; }
+.search-tab { background-color: #f0f0f0; color: #0d2e53; padding: 5px 10px; border-radius: 15px; font-weight: bold; margin-right: 5px; font-size: 14px; }
+.search-input { background: none; border: none; color: white; padding: 5px 10px; outline: none; flex-grow: 1; }
+.action-icons { display: flex; align-items: center; }
+.action-icons a { text-decoration: none; color: white; margin-left: 20px; font-weight: bold; display: flex; align-items: center; padding: 5px 10px; border-radius: 20px; transition: background-color 0.2s; }
+.create-btn { background-color: #f3722c; }
+.user-icon { background-color: #6a1b9a; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-left: 20px; }
 
-        /* Toggle Button */
-        .sidebar-toggle-btn { position: fixed; top: 112px; left: var(--sidebar-width-open); transform: translateX(-50%); background-color: white; width: var(--button-size); height: var(--button-size); border: 1px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1002; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #555; transition: left 0.3s ease; }
+/* Sidebar Navigation */
+.sidebar { width: var(--sidebar-width-open); background-color: white; padding-top: 60px; box-shadow: 2px 0 5px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; height: 100%; z-index: 999; box-sizing: border-box; transition: width 0.3s ease; overflow: hidden; border-right: 1px solid #ddd; }
+.sidebar.collapsed { width: var(--sidebar-width-closed); }
+.sidebar-menu { list-style: none; padding: 0; margin: 0; }
+.sidebar-item { display: flex; align-items: center; padding: 12px 20px; color: #333; cursor: pointer; font-weight: 500; white-space: nowrap; text-decoration: none; transition: all 0.3s ease; }
+.sidebar-item:hover { background-color: #e6e6e6; }
+.sidebar-item i { margin-right: 15px; width: 20px; text-align: center; }
+.category-header { font-weight: bold; color: #0d2e53; padding-top: 20px; }
+.sidebar-item.active { background-color: #e0f7fa; color: #0d2e53; border-left: 4px solid #0d2e53; }
+.divider { border-top: 1px solid #eee; margin: 10px 0; }
 
-        /* Main Content */
-        /* Anchors the content to the left of the remaining space */
+/* Toggle Button */
+.sidebar-toggle-btn { position: fixed; top: 112px; left: var(--sidebar-width-open); transform: translateX(-50%); background-color: white; width: var(--button-size); height: var(--button-size); border: 1px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 1002; box-shadow: 0 1px 3px rgba(0,0,0,0.1); color: #555; transition: left 0.3s ease; }
+
+/* Main Content */
+/* Anchors the content to the left of the remaining space */
 .main-content { 
-    margin-left: var(--sidebar-width-open); 
-    padding: 80px 40px 20px 40px; /* Added 40px left padding to create a small gap from the sidebar */
-    flex-grow: 1; 
-    transition: margin-left 0.3s ease; 
-    display: flex;
-    justify-content: flex-start; /* This forces the feed to start at the left */
+margin-left: var(--sidebar-width-open); 
+padding: 80px 40px 20px 40px; /* Added 40px left padding to create a small gap from the sidebar */
+flex-grow: 1; 
+transition: margin-left 0.3s ease; 
+display: flex;
+justify-content: flex-start; /* This forces the feed to start at the left */
 }
 
 /* Keeps the posts at a readable width without being pushed to the center */
 .feed-container {
-    width: 100%;
-    max-width: 700px; 
-    margin: 0; /* Ensures it doesn't try to auto-center itself */
+width: 100%;
+max-width: 700px; 
+margin: 0; /* Ensures it doesn't try to auto-center itself */
 }
 
-        .main-content-shifted { margin-left: var(--sidebar-width-closed); }
+.main-content-shifted { margin-left: var(--sidebar-width-closed); }
 
-        /* Post Cards */
-        .post-card { background-color: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
-        .post-header { display: flex; align-items: center; margin-bottom: 15px; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
-        .author-name { font-weight: bold; color: #333; }
-        .author-title-tag { font-size: 12px; background-color: #e0f7fa; color: #0d2e53; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
-        .post-date { font-size: 12px; color: #888; margin-left: auto; }
-        .post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0d2e53; }
-        .post-body { line-height: 1.6; color: #555; }
-        .action-button { display: inline-flex; align-items: center; background-color: #eee; color: #0d2e53; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 15px; }
-        .post-separator { border-top: 1px solid #eee; margin: 20px 0; }
-    </style>
+/* Post Cards */
+.post-card { background-color: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+.post-header { display: flex; align-items: center; margin-bottom: 15px; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
+.author-name { font-weight: bold; color: #333; }
+.author-title-tag { font-size: 12px; background-color: #e0f7fa; color: #0d2e53; padding: 2px 8px; border-radius: 10px; margin-left: 8px; }
+.post-date { font-size: 12px; color: #888; margin-left: auto; }
+.post-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #0d2e53; }
+.post-body { line-height: 1.6; color: #555; }
+.action-button { display: inline-flex; align-items: center; background-color: #eee; color: #0d2e53; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; font-size: 14px; margin-top: 15px; }
+.post-separator { border-top: 1px solid #eee; margin: 20px 0; }
+</style>
 </head>
 <body>
     <div id="login-screen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
@@ -83,175 +81,135 @@
 </div>
 
 <div id="wrapper" style="display: none;">
-    <div class="header">
-        <div class="logo">Falcon Feed</div>
-        <div class="search-area">
-            <i class="fas fa-search"></i>
-            <input type="text" class="search-input" placeholder="Search announcements...">
-        </div>
-        <div class="action-icons">
-            <a href="#" class="create-btn"><i class="fas fa-plus-square"></i> Create</a>
-        </div>
-        <div class="user-icon">VU</div>
-    </div>
-    
-    <div class="sidebar-toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
-//sidebar changes apple
-    <div class="sidebar" id="sidebar">
-    <ul class="sidebar-menu">
-        <a href="index.html" class="sidebar-item" id="nav-all"><i class="fas fa-home"></i> <span>Home</span></a>
-        
-        <div class="divider"></div>
-        <div class="sidebar-item category-header"><span>Groups</span></div>
-        
-        <a href="index.html?grade=EXEC" class="sidebar-item" id="nav-EXEC"><i class="fas fa-star"></i> <span>Executive</span></a>
-        <a href="index.html?grade=12" class="sidebar-item" id="nav-12"><span>12TH Seniors</span></a>
-        <a href="index.html?grade=11" class="sidebar-item" id="nav-11"><span>11TH Juniors</span></a>
-        <a href="index.html?grade=10" class="sidebar-item" id="nav-10"><span>10TH Sophomores</span></a>
-        <a href="index.html?grade=9" class="sidebar-item" id="nav-9"><span>9TH Freshmen</span></a>
-        
-        <div class="divider"></div>
-        <a href="faq.html" class="sidebar-item"><i class="fas fa-question-circle"></i> <span>FAQ</span></a>
-        <a href="about.html" class="sidebar-item"><i class="fas fa-info-circle"></i> <span>About</span></a>
-    </ul>
+<div class="header">
+<div class="logo">Falcon Feed</div>
+<div class="search-area">
+<i class="fas fa-search"></i>
+<input type="text" class="search-input" placeholder="Search announcements...">
+</div>
+<div class="action-icons">
+<a href="#" class="create-btn"><i class="fas fa-plus-square"></i> Create</a>
+</div>
+<div class="user-icon">VU</div>
 </div>
 
-    <div class="main-content" id="mainContent">
-    <div class="feed-container">
-        <div class="post-filter-bar">
-            <span>New <i class="fas fa-chevron-down"></i></span>
-            <i class="fas fa-ellipsis-h" style="margin-left: auto;"></i>
-        </div>
+<div class="sidebar-toggle-btn" id="sidebarToggle"><i class="fas fa-bars"></i></div>
+//sidebar changes apple
+<div class="sidebar" id="sidebar">
+<ul class="sidebar-menu">
+<a href="index.html" class="sidebar-item" id="nav-all"><i class="fas fa-home"></i> <span>Home</span></a>
 
-        <div id="announcement-container"></div>
-    </div>
+<div class="divider"></div>
+<div class="sidebar-item category-header"><span>Groups</span></div>
+
+<a href="index.html?grade=EXEC" class="sidebar-item" id="nav-EXEC"><i class="fas fa-star"></i> <span>Executive</span></a>
+<a href="index.html?grade=12" class="sidebar-item" id="nav-12"><span>12TH Seniors</span></a>
+<a href="index.html?grade=11" class="sidebar-item" id="nav-11"><span>11TH Juniors</span></a>
+<a href="index.html?grade=10" class="sidebar-item" id="nav-10"><span>10TH Sophomores</span></a>
+<a href="index.html?grade=9" class="sidebar-item" id="nav-9"><span>9TH Freshmen</span></a>
+
+<div class="divider"></div>
+<a href="faq.html" class="sidebar-item"><i class="fas fa-question-circle"></i> <span>FAQ</span></a>
+<a href="about.html" class="sidebar-item"><i class="fas fa-info-circle"></i> <span>About</span></a>
+</ul>
+</div>
+
+<div class="main-content" id="mainContent">
+<div class="feed-container">
+<div class="post-filter-bar">
+<span>New <i class="fas fa-chevron-down"></i></span>
+<i class="fas fa-ellipsis-h" style="margin-left: auto;"></i>
+</div>
+
+<div id="announcement-container"></div>
+</div>
 </div>
 
 //div for wrapper thingy
 </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // --- 1. GET THE FILTER FROM THE URL ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const gradeFilter = urlParams.get('grade'); // Returns '12', 'EXEC', etc., or null
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+// --- 1. GET THE FILTER FROM THE URL ---
+const urlParams = new URLSearchParams(window.location.search);
+const gradeFilter = urlParams.get('grade'); // Returns '12', 'EXEC', etc., or null
 
-        // Highlight active sidebar item
-        if (gradeFilter) {
-            document.getElementById(`nav-${gradeFilter}`)?.classList.add('active');
-            document.getElementById('nav-all').classList.remove('active');
-        }
-
-        // --- 2. DATA LOADING & FILTERING ---
-        const container = document.getElementById('announcement-container');
-
-        Papa.parse("announcements.csv", {
-            download: true,
-            header: true,
-            skipEmptyLines: true,
-            beforeFirstChunk: function(chunk) {
-                return chunk.replace(/, /g, ",");
-            },
-            complete: function(results) {
-                container.innerHTML = ''; 
-                
-                const filteredData = results.data.filter(row => {
-                    const isApproved = row.status === "Approved";
-                    const isNotDeleted = String(row.is_deleted).toUpperCase() !== "TRUE";
-                    
-                    // If a grade filter exists, only show matching rows. Otherwise, show all.
-                    const matchesGrade = !gradeFilter || String(row.grade) === gradeFilter;
-
-                    return isApproved && isNotDeleted && matchesGrade;
-                });
-
-                if (filteredData.length === 0) {
-                    container.innerHTML = `<p>No announcements found for ${gradeFilter || 'everyone'}.</p>`;
-                    return;
-                }
-
-                filteredData.forEach(row => {
-                    container.innerHTML += `
-                        <div class="post-card">
-                            <div class="post-header">
-                                <img src="https://via.placeholder.com/40" class="avatar">
-                                <div class="post-info">
-                                    <span class="author-name">${row.author_name || 'SGA Member'} 
-                                        <span class="author-title-tag">${row.grade || 'General'}</span>
-                                    </span>
-                                </div>
-                                <span class="post-date">${row.created_at || ''}</span>
-                            </div>
-                            <div class="post-title">${row.title}</div>
-                            <div class="post-body">${row.content}</div>
-                            <div class="action-button"><i class="fas fa-question-circle"></i> Ask a question</div>
-                        </div>
-                        <div class="post-separator"></div>
-                    `;
-                });
-            }
-        });
-
-        // Sidebar toggle logic (Keep your existing code here)
-        const sidebar = document.getElementById('sidebar');
-        const toggleButton = document.getElementById('sidebarToggle');
-        toggleButton.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
-    });
-//NEW SCRIPT
-    // Global variable to store the user's role
-let currentUserRole = "STUDENT"; 
-
-function handleCredentialResponse(response) {
-    const responsePayload = parseJwt(response.credential);
-    const userEmail = responsePayload.email;
-
-    // Load the permissions CSV
-    Papa.parse("permissions.csv", {
-        download: true,
-        header: true,
-        skipEmptyLines: true,
-        complete: function(results) {
-            // Find the row that matches the logged-in user's email
-            const userRow = results.data.find(row => 
-                row.email.trim().toLowerCase() === userEmail.toLowerCase()
-            );
-
-            // Assign role if found, otherwise default to STUDENT
-            currentUserRole = userRow ? userRow.role.toUpperCase() : "STUDENT";
-
-            console.log(`User: ${userEmail} | Role: ${currentUserRole}`);
-            
-            // Now that we have the role, unlock the site
-            unlockSite(responsePayload);
-        }
-    });
+// Highlight active sidebar item
+if (gradeFilter) {
+document.getElementById(`nav-${gradeFilter}`)?.classList.add('active');
+document.getElementById('nav-all').classList.remove('active');
 }
 
-function unlockSite(userData) {
-    // 1. Hide Login / Show Site
+// --- 2. DATA LOADING & FILTERING ---
+const container = document.getElementById('announcement-container');
+
+Papa.parse("announcements.csv", {
+download: true,
+header: true,
+skipEmptyLines: true,
+beforeFirstChunk: function(chunk) {
+return chunk.replace(/, /g, ",");
+},
+complete: function(results) {
+container.innerHTML = ''; 
+
+const filteredData = results.data.filter(row => {
+const isApproved = row.status === "Approved";
+const isNotDeleted = String(row.is_deleted).toUpperCase() !== "TRUE";
+
+// If a grade filter exists, only show matching rows. Otherwise, show all.
+const matchesGrade = !gradeFilter || String(row.grade) === gradeFilter;
+
+return isApproved && isNotDeleted && matchesGrade;
+});
+
+if (filteredData.length === 0) {
+container.innerHTML = `<p>No announcements found for ${gradeFilter || 'everyone'}.</p>`;
+return;
+}
+
+filteredData.forEach(row => {
+container.innerHTML += `
+                       <div class="post-card">
+                           <div class="post-header">
+                               <img src="https://via.placeholder.com/40" class="avatar">
+                               <div class="post-info">
+                                   <span class="author-name">${row.author_name || 'SGA Member'} 
+                                       <span class="author-title-tag">${row.grade || 'General'}</span>
+                                   </span>
+                               </div>
+                               <span class="post-date">${row.created_at || ''}</span>
+                           </div>
+                           <div class="post-title">${row.title}</div>
+                           <div class="post-body">${row.content}</div>
+                           <div class="action-button"><i class="fas fa-question-circle"></i> Ask a question</div>
+                       </div>
+                       <div class="post-separator"></div>
+                   `;
+});
+}
+});
+
+// Sidebar toggle logic (Keep your existing code here)
+const sidebar = document.getElementById('sidebar');
+const toggleButton = document.getElementById('sidebarToggle');
+toggleButton.addEventListener('click', () => {
+sidebar.classList.toggle('collapsed');
+});
+});
+//NEW SCRIPT
+    function handleCredentialResponse(response) {
+    // Decode the Google JWT token to get user info
+    const responsePayload = parseJwt(response.credential);
+
+    console.log("Logged in as: " + responsePayload.name);
+
+    // 1. Hide the login screen and show the website
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('wrapper').style.display = 'block';
 
-    // 2. Update Sidebar Avatar with Google Profile Pic
-    const avatarImg = document.querySelector('.sidebar .avatar');
-    if (avatarImg) avatarImg.src = userData.picture;
-
-    // 3. Show/Hide Admin UI elements
-    const createBtn = document.querySelector('.create-btn');
-    if (currentUserRole === "ADMIN") {
-        createBtn.style.display = 'flex';
-    } else {
-        createBtn.style.display = 'none';
-    }
-}
-
-    // Example: Update the sidebar avatar with the Google Profile Pic
-    const avatarImg = document.querySelector('.sidebar .avatar'); // Adjust selector as needed
-    if (avatarImg) {
-        avatarImg.src = userData.picture;
-    }
+    // 2. (Optional) Store user info to show their name/picture in the sidebar
+    // localStorage.setItem('user_name', responsePayload.name);
 }
 
 // Helper function to decode user info from Google
@@ -284,4 +242,4 @@ window.onload = function () {
 
 
 
-
+~

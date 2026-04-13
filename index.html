@@ -135,7 +135,7 @@ body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: 
 </div>
 
 <script>
-const pb = new PocketBase('https://a1b2-c3d4.ngrok-free.app');
+
 
         
 document.addEventListener('DOMContentLoaded', function() {
@@ -151,26 +151,38 @@ document.getElementById('nav-all').classList.remove('active');
 
 // --- 2. DATA LOADING & FILTERING ---
 const container = document.getElementById('announcement-container');
+//THIS IS WHERE I CHANGED PAPAPARSE UIUI
+const pb = new PocketBase('https://a1b2-c3d4.ngrok-free.app');
 
-Papa.parse("announcements.csv", {
-download: true,
-header: true,
-skipEmptyLines: true,
-beforeFirstChunk: function(chunk) {
-return chunk.replace(/, /g, ",");
-},
-complete: function(results) {
-container.innerHTML = ''; 
+async function loadAnnouncements() {
+    const container = document.getElementById('announcement-container');
+    
+    // 1. Fetch records from PocketBase
+    // This replaces the CSV loading
+    const records = await pb.collection('announcements').getFullList({
+        filter: 'status = "Approved" && is_deleted != true',
+        sort: '-created', // Newest first
+    });
 
-const filteredData = results.data.filter(row => {
-const isApproved = row.status === "Approved";
-const isNotDeleted = String(row.is_deleted).toUpperCase() !== "TRUE";
+    container.innerHTML = ''; 
 
-// If a grade filter exists, only show matching rows. Otherwise, show all.
-const matchesGrade = !gradeFilter || String(row.grade) === gradeFilter;
+    // 2. Loop through records exactly like you did with CSV data
+    records.forEach(record => {
+        container.innerHTML += `
+            <div class="post-card">
+                <div class="post-header">
+                    <div class="post-info">
+                        <span class="author-name">${record.author_name}</span>
+                    </div>
+                </div>
+                <div class="post-title">${record.title}</div>
+                <div class="post-body">${record.content}</div>
+            </div>
+        `;
+    });
+}
 
-return isApproved && isNotDeleted && matchesGrade;
-});
+loadAnnouncements();
 
 if (filteredData.length === 0) {
 container.innerHTML = `<p>No announcements found for ${gradeFilter || 'everyone'}.</p>`;

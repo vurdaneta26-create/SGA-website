@@ -211,6 +211,20 @@ container.innerHTML += `
 }
 });
 
+//POSTS SUBMISSIONS FUNCTION MEIMEI
+async function submitPost() {
+    const data = {
+        "title": document.getElementById('title-input').value,
+        "content": document.getElementById('content-input').value,
+        "grade": "12", // You can get this from their logged-in profile
+        "status": "Pending" // Set to pending so an admin has to approve it
+    };
+
+    const record = await pb.collection('announcements').create(data);
+    alert("Post submitted for approval!");
+}
+        
+
 // Sidebar toggle logic (Keep your existing code here)
 const sidebar = document.getElementById('sidebar');
 const toggleButton = document.getElementById('sidebarToggle');
